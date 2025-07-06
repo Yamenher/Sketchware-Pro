@@ -113,6 +113,7 @@ import mod.jbk.build.BuiltInLibraries;
 import mod.jbk.diagnostic.CompileErrorSaver;
 import mod.jbk.diagnostic.MissingFileException;
 import mod.jbk.util.LogUtil;
+import mod.yamenher.ApkSignerUtils;
 import mod.khaled.logcat.LogReaderActivity;
 import pro.sketchware.R;
 import pro.sketchware.activities.appcompat.ManageAppCompatActivity;
@@ -1179,13 +1180,22 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
                 }
 
                 onProgress("Signing APK...", 20);
-                builder.signDebugApk();
+                ApkSignerUtils.signWithTestkey(builder.yq.unsignedUnalignedApkPath, builder.yq.finalToInstallApkPath, new ApkSignerUtils.SignCallback() {
+                    @Override
+                    public void onSuccess(File outputFile) {
+                        activity.installBuiltApk();
+                        isBuildFinished = true;
+                    }
+                    
+                    @Override
+                    public void onFailure(Exception e) {
+                    }
+                    
+                });
+                
                 if (canceled) {
                     return;
                 }
-
-                activity.installBuiltApk();
-                isBuildFinished = true;
             } catch (MissingFileException e) {
                 isBuildFinished = true;
                 activity.runOnUiThread(() -> {

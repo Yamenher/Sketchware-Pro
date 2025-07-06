@@ -101,6 +101,11 @@ dependencies {
     implementation 'androidx.exifinterface:exifinterface:1.4.1'
     implementation "androidx.preference:preference:1.2.1"
     implementation files('libs/android-svg.jar')
+    
+    implementation 'com.github.MuntashirAkon:apksig-android:4.4.0'
+    implementation 'com.github.MuntashirAkon:sun-security-android:1.0'
+    implementation files('libs/bcpkix-jdk18on-1.81.jar')
+    implementation files('libs/bcprov-jdk18on-1.81.jar')
 
     def editorGroupId = "io.github.Rosemoe.sora-editor"
     implementation platform("$editorGroupId:bom:0.23.5")

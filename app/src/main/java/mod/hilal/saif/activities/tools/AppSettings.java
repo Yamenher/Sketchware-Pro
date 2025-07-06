@@ -36,7 +36,7 @@ import dev.pranav.filepicker.FilePickerCallback;
 import dev.pranav.filepicker.FilePickerDialogFragment;
 import dev.pranav.filepicker.FilePickerOptions;
 import dev.pranav.filepicker.SelectionMode;
-import mod.alucard.tn.apksigner.ApkSigner;
+import mod.yamenher.ApkSignerUtils;
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
 import mod.khaled.logcat.LogReaderActivity;
@@ -233,38 +233,26 @@ public class AppSettings extends BaseAppCompatActivity {
 
         tv_progress.setText("Signing APK...");
 
-        AlertDialog building_dialog = new MaterialAlertDialogBuilder(this)
-                .setView(building_root)
-                .create();
+        AlertDialog building_dialog = new MaterialAlertDialogBuilder(this).setView(building_root).create();
 
-        ApkSigner signer = new ApkSigner();
-        new Thread() {
+        ApkSignerUtils.SignCallback signCallback = new ApkSignerUtils.SignCallback() {
             @Override
-            public void run() {
-                super.run();
-
-                ApkSigner.LogCallback callback = line -> runOnUiThread(() ->
-                        tv_log.setText(Helper.getText(tv_log) + line));
-
-                if (useTestkey) {
-                    signer.signWithTestKey(inputApkPath, outputApkPath, callback);
-                } else {
-                    signer.signWithKeyStore(inputApkPath, outputApkPath,
-                            keyStorePath, keyStorePassword, keyStoreKeyAlias, keyPassword, callback);
-                }
-
-                runOnUiThread(() -> {
-                    if (ApkSigner.LogCallback.errorCount.get() == 0) {
-                        building_dialog.dismiss();
-                        SketchwareUtil.toast("Successfully saved signed APK to: /Internal storage/sketchware/signed_apk/"
-                                        + Uri.fromFile(new File(outputApkPath)).getLastPathSegment(),
-                                Toast.LENGTH_LONG);
-                    } else {
-                        tv_progress.setText("An error occurred. Check the log for more details.");
-                    }
-                });
+            public void onSuccess(File signedApk) {
+                building_dialog.dismiss();
+                SketchwareUtil.toast("Successfully saved signed APK to: " + signedApk.getAbsolutePath(), Toast.LENGTH_LONG);
             }
-        }.start();
+              
+            @Override
+            public void onFailure(Exception e) {
+                tv_progress.setText("An error occurred. Check the log for more details.");
+            }
+        };
+
+        if (useTestkey) {
+            ApkSignerUtils.signWithTestkey(inputApkPath, outputApkPath, signCallback);
+        } else {
+            ApkSignerUtils.signFileWithReleaseKey(inputApkPath, outputApkPath, keyStorePath, keyStorePassword, keyStoreKeyAlias, keyPassword, signCallback);
+        }
 
         building_dialog.show();
     }

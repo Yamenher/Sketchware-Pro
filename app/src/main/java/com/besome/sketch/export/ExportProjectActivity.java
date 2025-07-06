@@ -52,7 +52,7 @@ import mod.jbk.build.BuildProgressReceiver;
 import mod.jbk.build.BuiltInLibraries;
 import mod.jbk.build.compiler.bundle.AppBundleCompiler;
 import mod.jbk.export.GetKeyStoreCredentialsDialog;
-import mod.jbk.util.TestkeySignBridge;
+import mod.yamenher.ApkSignerUtils;
 import pro.sketchware.R;
 import pro.sketchware.utility.FilePathUtil;
 import pro.sketchware.utility.FileUtil;
@@ -658,19 +658,9 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
                     publishProgress("Signing APK...");
                     String outputLocation = getCorrectResultFilename(builder.yq.releaseApkPath);
                     if (signWithTestkey) {
-                        TestkeySignBridge.signWithTestkey(builder.yq.unsignedAlignedApkPath, outputLocation);
+                         ApkSignerUtils.signWithTestkey(builder.yq.unsignedAlignedApkPath, outputLocation, null);
                     } else if (isResultJarSigningEnabled()) {
-                        Security.addProvider(new BouncyCastleProvider());
-                        CustomKeySigner.signZip(
-                                new ZipSigner(),
-                                wq.j(),
-                                signingKeystorePassword,
-                                signingAliasName,
-                                signingKeystorePassword,
-                                signingAlgorithm,
-                                builder.yq.unsignedAlignedApkPath,
-                                outputLocation
-                        );
+                         ApkSignerUtils.signFileWithReleaseKey(builder.yq.unsignedAlignedApkPath, outputLocation, wq.j(), signingAliasName, new String(signingKeystorePassword), new String(signingAliasPassword), null);
                     } else {
                         FileUtil.copyFile(builder.yq.unsignedAlignedApkPath, outputLocation);
                     }

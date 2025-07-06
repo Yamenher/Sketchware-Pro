@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Process;
 import android.util.Log;
 
+import com.google.firebase.FirebaseApp;
+
 import com.besome.sketch.tools.CollectErrorActivity;
 
 import pro.sketchware.utility.theme.ThemeManager;
@@ -19,6 +21,7 @@ public class SketchApplication extends Application {
 
     @Override
     public void onCreate() {
+        FirebaseApp.initializeApp(this);
         mApplicationContext = getApplicationContext();
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
